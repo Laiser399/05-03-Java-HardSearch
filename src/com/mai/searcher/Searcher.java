@@ -1,157 +1,207 @@
 package com.mai.searcher;
 
 
+import com.mai.searcher.exceptions.FileReadException;
+import com.mai.searcher.exceptions.FileWriteException;
+import com.mai.searcher.exceptions.ThreadException;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 public class Searcher {
-    private static final int CHARS_FOR_THREAD = 10_000_000;
+    private static final int LINES_PER_THREAD = 100_000;
     private static final int THREAD_COUNT = 4;
 
-    public void start() throws IOException, InterruptedException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    public void start() {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            while (true) {
+                String filename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\big_file.txt";
+                String searchString = "программа";
+                int indent = 2;
+                String saveFilename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\result.txt";
 
-        while (true) {
-            String filename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\big_file.txt";
-            String searchString = "терминал";
-            int indent = 10;
-            String saveFilename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\result.txt";
-
-//            System.out.print("Enter file name: ");
-//            String filename = reader.readLine();
-//            System.out.print("Enter search string: ");
-//            String searchString = reader.readLine();
-//            int indent = fetchCharsIndent(reader);
-//            System.out.print("Save to: ");
-//            String saveFilename = reader.readLine();
+//                System.out.print("Enter file name: ");
+//                String filename = reader.readLine();
+//                System.out.print("Enter search string: ");
+//                String searchString = reader.readLine();
+//                int indent = fetchIndent(reader);
+//                System.out.print("Save to: ");
+//                String saveFilename = reader.readLine();
 
 
-            long startTime = new Date().getTime();
+                long startTime = new Date().getTime();
 
-            SearchResults results = search(filename, searchString, indent);
-            saveResults(saveFilename, results, searchString, indent);
+                try {
+                    SearchResults results = search(filename, searchString, indent);
+                    saveResults(saveFilename, results, searchString, indent);
 
-            System.out.println("Results saved to \"" + saveFilename + "\". Found " + results.count() + ".");
-            System.out.println("Search ends in " + (new Date().getTime() - startTime) + "ms");
+                    System.out.println("Results saved to \"" + saveFilename + "\". Found " + results.count() + ".");
+                    System.out.println("Search ends in " + (new Date().getTime() - startTime) + "ms");
+                }
+                catch (FileNotFoundException|FileReadException|ThreadException|FileWriteException e) {
+                    System.out.println(e.getMessage());
+                }
 
-            return;
+                return;//TODO
+            }
+        }
+        catch (IOException e) {
+            System.out.println("Console IO error.");
         }
     }
 
-    private int fetchCharsIndent(BufferedReader reader) throws IOException {
+    private int fetchIndent(BufferedReader reader) throws IOException {
         Integer indent = null;
         while (indent == null) {
-            System.out.print("Enter chars indent: ");
-            String indentStr = reader.readLine();
+            System.out.print("Enter lines indent: ");
             try {
-                indent = Integer.parseInt(indentStr);
-                if (indent < 0) {
-                    System.out.println("Wrong indent format (< 0).");
-                    indent = null;
-                }
+                indent = Integer.parseInt(reader.readLine());
+                if (indent < 0)
+                    throw new NumberFormatException();
             }
             catch (NumberFormatException e) {
-                System.out.println("Wrong integer format.");
+                System.out.println("Wrong indent format.");
             }
         }
 
         return indent;
     }
 
-    private SearchResults search(String filename, String searchString, int indent) throws IOException, InterruptedException {
-        InputStreamReader reader = new InputStreamReader(new FileInputStream(filename));
-        long fileSize = new File(filename).length();
+    private SearchResults search(String filename, String searchString, int lineIndent)
+            throws FileNotFoundException, FileReadException, ThreadException
+    {
+        long fileSize = getFileSize(filename);
+        if (fileSize == -1)
+            throw new FileNotFoundException("Cant fetch size of file \"" + filename + "\".");
+
+        SearchResults searchResults = new SearchResults();
+        int needLines = THREAD_COUNT * LINES_PER_THREAD + lineIndent * 2;
+        List<String> lines = new ArrayList<>(needLines);
         long startTime = new Date().getTime();
+        long charsRemoved = 0;
+        int start = 0, linesOffset = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            while (reader.ready()) {
+                readLinesTo(reader, lines, needLines);
 
-        SearchResults result = new SearchResults();
+                searchResults.add(executeThreads(lines, searchString, lineIndent, linesOffset, start));
 
-        int start = 0, offset = 0;
-        int needToRead = CHARS_FOR_THREAD * THREAD_COUNT + searchString.length() - 1 + indent * 2;
-        StringBuilder builder = new StringBuilder(needToRead + 100);
-        while (reader.ready()) {
-            readTo(reader, builder, needToRead);
+                start = lineIndent;
+                int forDelete = Math.min(lines.size(), LINES_PER_THREAD * THREAD_COUNT - lineIndent + start);
+                linesOffset += forDelete;
+                charsRemoved += charsCount(lines, 0, forDelete) + forDelete;
 
-            List<SearchThread> threads = new ArrayList<>();
-            for (int i = 0; i < THREAD_COUNT; ++i) {
-                SearchThread thread = new SearchThread(builder, searchString,
-                        start + i * CHARS_FOR_THREAD, CHARS_FOR_THREAD, indent, offset);
-                thread.start();
-                threads.add(thread);
+                lines = new ArrayList<>(lines.subList(forDelete, lines.size()));
+
+                updateStatus(new Date().getTime() - startTime,
+                        (double) charsRemoved / fileSize, searchResults.count());
             }
-
-            for (Thread thread : threads)
-                thread.join();
-
-            for (SearchThread thread : threads)
-                result.add(thread.getSearchResults());
-
-            int forDelete = Math.min(builder.length(), CHARS_FOR_THREAD * THREAD_COUNT - indent + start);
-            offset += forDelete;
-            start = indent;
-            builder.delete(0, forDelete);
-
-            updateStatus(new Date().getTime() - startTime,
-                    (double) offset / fileSize, result.count());
+        }
+        catch (IOException e) {
+            throw new FileReadException("Error while read search file \"" + filename + "\".");
+        }
+        catch (InterruptedException e) {
+            throw new ThreadException("Error while threading.");
         }
 
-        reader.close();
+        return searchResults;
+    }
 
+    private long getFileSize(String filename) {
+        try {
+            return Files.size(Paths.get(filename));
+        }
+        catch (IOException e) {
+            return -1;
+        }
+    }
+
+    private void readLinesTo(BufferedReader reader, List<String> lines, int count) throws IOException {
+        while (reader.ready() && lines.size() < count)
+            lines.add(reader.readLine());
+    }
+
+    private SearchResults executeThreads(List<String> lines, String searchString, int lineIndent,
+                                         int lineOffset, int start) throws InterruptedException
+    {
+        SearchResults searchResults = new SearchResults();
+        SearchThread[] threads = new SearchThread[THREAD_COUNT];
+        for (int i = 0; i < THREAD_COUNT; ++i) {
+            SearchThread thread = new SearchThread(lines, searchString,
+                    start + i * LINES_PER_THREAD, LINES_PER_THREAD, lineIndent, lineOffset);
+            thread.start();
+            threads[i] = thread;
+        }
+
+        for (SearchThread thread : threads)
+            thread.join();
+
+        for (SearchThread thread: threads)
+            searchResults.add(thread.getSearchResults());
+
+        return searchResults;
+    }
+
+    private long charsCount(List<String> lines, int start, int end) {
+        long result = 0;
+        for (int i = start; i < end; ++i)
+            result += lines.get(i).length();
         return result;
     }
 
-    private void readTo(Reader reader, StringBuilder out, int minSize) throws IOException {
-        char[] buf = new char[100];
-        while (out.length() < minSize && reader.ready()) {
-            int readCount = reader.read(buf);
-            out.append(buf, 0, readCount);
-        }
-    }
-
-    private void updateStatus(long timeRunning, double doneStatus, int countMatches) throws IOException {
+    private void updateStatus(long timeRunning, double doneStatus, int countMatches) {
         String doneStr = Double.toString(doneStatus * 100);
         if (doneStr.length() > 5)
             doneStr = doneStr.substring(0, 5);
 
         System.out.println("Running: " + timeRunning + "ms");
         System.out.println("Done: " + doneStr + "%");
-        System.out.println("Count of matcher: " + countMatches);
+        System.out.println("Count of matches: " + countMatches);
     }
 
-    private void saveResults(String filename, SearchResults results, String searchString, int indent) throws IOException {
-        FileWriter writer = new FileWriter(filename);
-        writer.write("Search for: ");
-        writer.write(searchString);
-        writer.write('\n');
-        writer.write("Indent: ");
-        writer.write(Integer.toString(indent));
-        writer.write("\n\n");
-
-        for (SearchResult result : results.get()) {
-            writer.write("At:     ");
-            writer.write(Integer.toString(result.getIndex()));
+    private void saveResults(String filename, SearchResults results, String searchString, int indent)
+            throws FileWriteException
+    {
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.write("Search for: ");
+            writer.write(searchString);
             writer.write('\n');
-            writer.write("String: ");
-            writer.write(result.getFound());
+            writer.write("Indent: ");
+            writer.write(Integer.toString(indent));
             writer.write("\n\n");
+
+            for (SearchResult result : results.get()) {
+                writer.write("At line: ");
+                writer.write(Integer.toString(result.getLineOfResult()));
+
+                for (String line : result.getLinesBefore()) {
+                    writer.write('\n');
+                    writer.write("    ");
+                    writer.write(line);
+                }
+                writer.write("\n--> ");
+                writer.write(result.getResult());
+                for (String line : result.getLinesAfter()) {
+                    writer.write('\n');
+                    writer.write("    ");
+                    writer.write(line);
+                }
+                writer.write("\n\n");
+            }
         }
-        writer.close();
+        catch (IOException e) {
+            throw new FileWriteException("Error while write to \"" + filename + "\".");
+        }
     }
+
 
 
     public static void main(String[] args) {
         Searcher searcher = new Searcher();
-        try {
-            searcher.start();
-        }
-        catch (IOException e) {
-            System.out.println("IO error: " + e.getMessage());
-        }
-        catch (InterruptedException e) {
-            System.out.println("Thread error: " + e.getMessage());
-        }
+        searcher.start();
     }
 
 }

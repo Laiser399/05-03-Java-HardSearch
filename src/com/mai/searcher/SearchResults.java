@@ -6,8 +6,8 @@ import java.util.List;
 public class SearchResults {
     private List<SearchResult> results = new ArrayList<>();
 
-    public void add(String result, int startIndex) {
-        results.add(new SearchResult(result, startIndex));
+    public void add(List<String> resultLines, int linesOffset, int indexOfResult) {
+        results.add(new SearchResult(resultLines, linesOffset, indexOfResult));
     }
 
     public void add(SearchResults another) {

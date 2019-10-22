@@ -1,38 +1,35 @@
 package com.mai.searcher;
 
+import java.util.List;
+
 import static java.lang.Math.min;
 import static java.lang.Math.max;
 
 public class SearchThread extends Thread {
-    private StringBuilder content;
+    private List<String> lines;
     private String searchString;
-    private int startFrom, size, indent, offset;
+    private int startFrom, count, indent, offset;
     private SearchResults searchResults = new SearchResults();
 
-    public SearchThread(StringBuilder content, String searchString, int startFrom, int size, int indent, int offset) {
-        this.content = content;
+    public SearchThread(List<String> lines, String searchString, int startFrom, int count, int indent, int offset) {
+        this.lines = lines;
         this.searchString = searchString;
         this.startFrom = startFrom;
-        this.size = size;
+        this.count = count;
         this.indent = indent;
         this.offset = offset;
     }
 
     @Override
     public void run() {
-        if (startFrom >= content.length())
-            return;
-        String buf = content.substring(startFrom, min(content.length(), startFrom + size + searchString.length() - 1));
-
-        int index;
-        int start = 0;
-        while ((index = buf.indexOf(searchString, start)) != -1) {
-            int startIndex = max(0, startFrom + index - indent),
-                endIndex = min(content.length(), startFrom + index + searchString.length() + indent);
-            String result = content.substring(startIndex, endIndex);
-            searchResults.add(result, offset + startIndex);
-
-            start = index + searchString.length();
+        for (int i = startFrom; i < min(lines.size(), startFrom + count); ++i) {
+            String line = lines.get(i);
+            if (line.contains(searchString)) {
+                int firstIndex = max(0, i - indent),
+                    endIndex = min(lines.size(), i + indent + 1);
+                List<String> resultLines = lines.subList(firstIndex, endIndex);
+                searchResults.add(resultLines, offset + firstIndex, i - firstIndex);
+            }
         }
     }
 
