@@ -18,6 +18,7 @@ public class Searcher {
     public void start() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (true) {
+
                 String filename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\big_file.txt";
                 String searchString = "программа";
                 int indent = 2;
@@ -35,10 +36,10 @@ public class Searcher {
                 long startTime = new Date().getTime();
 
                 try {
-                    SearchResults results = search(filename, searchString, indent);
+                    List<Match> results = search(filename, searchString, indent);
                     saveResults(saveFilename, results, searchString, indent);
 
-                    System.out.println("Results saved to \"" + saveFilename + "\". Found " + results.count() + ".");
+                    System.out.println("Results saved to \"" + saveFilename + "\". Found " + results.size() + ".");
                     System.out.println("Search ends in " + (new Date().getTime() - startTime) + "ms");
                 }
                 catch (FileNotFoundException|FileReadException|ThreadException|FileWriteException e) {
@@ -70,14 +71,14 @@ public class Searcher {
         return indent;
     }
 
-    private SearchResults search(String filename, String searchString, int lineIndent)
+    private List<Match> search(String filename, String searchString, int lineIndent)
             throws FileNotFoundException, FileReadException, ThreadException
     {
         long fileSize = getFileSize(filename);
         if (fileSize == -1)
             throw new FileNotFoundException("Cant fetch size of file \"" + filename + "\".");
 
-        SearchResults searchResults = new SearchResults();
+        List<Match> searchResults = new ArrayList<>();
         int needLines = THREAD_COUNT * LINES_PER_THREAD + lineIndent * 2;
         List<String> lines = new ArrayList<>(needLines);
         long startTime = new Date().getTime();
@@ -87,7 +88,7 @@ public class Searcher {
             while (reader.ready()) {
                 readLinesTo(reader, lines, needLines);
 
-                searchResults.add(executeThreads(lines, searchString, lineIndent, linesOffset, start));
+                searchResults.addAll(executeThreads(lines, searchString, lineIndent, linesOffset, start));
 
                 start = lineIndent;
                 int forDelete = Math.min(lines.size(), LINES_PER_THREAD * THREAD_COUNT - lineIndent + start);
@@ -97,7 +98,7 @@ public class Searcher {
                 lines = new ArrayList<>(lines.subList(forDelete, lines.size()));
 
                 updateStatus(new Date().getTime() - startTime,
-                        (double) charsRemoved / fileSize, searchResults.count());
+                        (double) charsRemoved / fileSize, searchResults.size());
             }
         }
         catch (IOException e) {
@@ -124,10 +125,10 @@ public class Searcher {
             lines.add(reader.readLine());
     }
 
-    private SearchResults executeThreads(List<String> lines, String searchString, int lineIndent,
+    private List<Match> executeThreads(List<String> lines, String searchString, int lineIndent,
                                          int lineOffset, int start) throws InterruptedException
     {
-        SearchResults searchResults = new SearchResults();
+        List<Match> searchResults = new ArrayList<>();
         SearchThread[] threads = new SearchThread[THREAD_COUNT];
         for (int i = 0; i < THREAD_COUNT; ++i) {
             SearchThread thread = new SearchThread(lines, searchString,
@@ -140,7 +141,7 @@ public class Searcher {
             thread.join();
 
         for (SearchThread thread: threads)
-            searchResults.add(thread.getSearchResults());
+            searchResults.addAll(thread.getMatches());
 
         return searchResults;
     }
@@ -162,7 +163,7 @@ public class Searcher {
         System.out.println("Count of matches: " + countMatches);
     }
 
-    private void saveResults(String filename, SearchResults results, String searchString, int indent)
+    private void saveResults(String filename, List<Match> matches, String searchString, int indent)
             throws FileWriteException
     {
         try (FileWriter writer = new FileWriter(filename)) {
@@ -173,7 +174,7 @@ public class Searcher {
             writer.write(Integer.toString(indent));
             writer.write("\n\n");
 
-            for (SearchResult result : results.get()) {
+            for (Match result : matches) {
                 writer.write("At line: ");
                 writer.write(Integer.toString(result.getLineOfResult()));
 

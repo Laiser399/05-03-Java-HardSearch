@@ -2,12 +2,12 @@ package com.mai.searcher;
 
 import java.util.List;
 
-public class SearchResult {
+public class Match {
     private String[] linesBefore, linesAfter;
     private String result;
     private int lineOfResult;
 
-    public SearchResult(List<String> found, int lineOffset, int indexOfResult) {
+    public Match(List<String> found, int lineOffset, int indexOfResult) {
         linesBefore = new String[indexOfResult];
         found.subList(0, indexOfResult).toArray(linesBefore);
         result = found.get(indexOfResult);

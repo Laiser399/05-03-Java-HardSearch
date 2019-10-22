@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7e7d615d-9e90-40b2-bedb-84da7012f76b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/com/mai/searcher/exceptions/FileReadException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/mai/searcher/exceptions/FileWriteException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/mai/searcher/exceptions/ThreadException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/generator/Generator.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/generator/Generator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchResult.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchResults.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchResults.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/Searcher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/Searcher.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/mai/generator/Generator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/generator/Generator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/SearchResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/Match.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchResults.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/SearchResults.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/SearchThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/Searcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/Searcher.java" afterDir="false" />

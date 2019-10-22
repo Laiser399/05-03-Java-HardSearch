@@ -1,5 +1,6 @@
 package com.mai.searcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.min;
@@ -9,7 +10,7 @@ public class SearchThread extends Thread {
     private List<String> lines;
     private String searchString;
     private int startFrom, count, indent, offset;
-    private SearchResults searchResults = new SearchResults();
+    private List<Match> matches = new ArrayList<>();
 
     public SearchThread(List<String> lines, String searchString, int startFrom, int count, int indent, int offset) {
         this.lines = lines;
@@ -28,14 +29,15 @@ public class SearchThread extends Thread {
                 int firstIndex = max(0, i - indent),
                     endIndex = min(lines.size(), i + indent + 1);
                 List<String> resultLines = lines.subList(firstIndex, endIndex);
-                searchResults.add(resultLines, offset + firstIndex, i - firstIndex);
+                matches.add(new Match(resultLines,
+                        offset + firstIndex, i - firstIndex));
             }
         }
     }
 
-    public SearchResults getSearchResults() {
+    public List<Match> getMatches() {
         if (isAlive())
             return null;
-        return searchResults;
+        return matches;
     }
 }
