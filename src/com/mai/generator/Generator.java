@@ -6,9 +6,9 @@ import java.util.Random;
 
 
 public class Generator {
-    private static final String filename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\big_file.txt";
-    private static final int linesCount = 40_000_000;
-    private static final float chanceToInsert = 0.0002f;
+    private static final String filename = "D:\\_BIG_FILES_\\BigFileForJavaLab\\big_file2.txt";
+    private static final int linesCount = 10_000;
+    private static final float chanceToInsert = 0.002f;
     private static final String[] words = {
             "программа", "слово", "терминал", "процесс", "символ"
     };

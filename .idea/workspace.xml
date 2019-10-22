@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7e7d615d-9e90-40b2-bedb-84da7012f76b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/Match.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchResults.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/SearchResults.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/SearchThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/SearchThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/Searcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/Searcher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/generator/Generator.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/generator/Generator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/Match.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/Match.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/SearchResults.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/Searcher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/LAB 05 03 hard search/com/mai/searcher/Searcher.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/mai/generator/Generator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/generator/Generator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/Match.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/Match.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/mai/searcher/Searcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/mai/searcher/SearcherConsole.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,7 +51,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Searcher">
+  <component name="RunManager">
     <configuration name="Generator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.mai.generator.Generator" />
       <module name="LAB 05 03 hard search" />
@@ -71,12 +75,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Searcher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.mai.searcher.Searcher" />
+    <configuration name="SearcherConsole" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.mai.searcher.SearcherConsole" />
       <module name="LAB 05 03 hard search" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.mai.searcher.*" />
+          <option name="PATTERN" value="com.mai.searcher.SearcherConsole" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -86,7 +90,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Searcher" />
+        <item itemvalue="Application.SearcherConsole" />
         <item itemvalue="Application.Generator" />
         <item itemvalue="Application.Main" />
       </list>

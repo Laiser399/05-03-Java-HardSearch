@@ -1,5 +1,7 @@
 package com.mai.searcher;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.List;
 
 public class Match {
@@ -15,6 +17,10 @@ public class Match {
         found.subList(indexOfResult + 1, found.size()).toArray(linesAfter);
 
         lineOfResult = lineOffset + indexOfResult;
+    }
+
+    private void foo(Collection<String> collection) {
+
     }
 
     public String[] getLinesBefore() {
